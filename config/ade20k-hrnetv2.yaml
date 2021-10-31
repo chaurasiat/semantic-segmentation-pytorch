@@ -3,11 +3,11 @@ DATASET:
   list_train: "./training.odgt"
   list_val: "./validation.odgt"
   num_class: 2
-  imgSizes: (1200, 1400, 1600)
+  imgSizes: (1200, 1300, 1400)
   imgMaxSize: 3000
   padding_constant: 32
   segm_downsampling_rate: 4
-  random_flip: True
+  random_flip: False
 
 MODEL:
   arch_encoder: "hrnetv2"
@@ -16,9 +16,9 @@ MODEL:
 
 TRAIN:
   batch_size_per_gpu: 1
-  num_epoch: 30
+  num_epoch: 5
   start_epoch: 0
-  epoch_iters: 500
+  epoch_iters: 360
   optim: "SGD"
   lr_encoder: 0.02
   lr_decoder: 0.02

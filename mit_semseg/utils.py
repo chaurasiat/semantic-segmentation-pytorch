@@ -27,6 +27,8 @@ def find_recursive(root_dir, ext='.jpg'):
     for root, dirnames, filenames in os.walk(root_dir):
         for filename in fnmatch.filter(filenames, '*' + ext):
             files.append(os.path.join(root, filename))
+        for filename in fnmatch.filter(filenames, '*' + ".png"):
+            files.append(os.path.join(root, filename))
     return files
 
 
