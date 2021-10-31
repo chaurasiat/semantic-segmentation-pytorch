@@ -75,7 +75,7 @@ def test(segmentation_module, loader, gpu):
                 feed_dict = async_copy_to(feed_dict, gpu)
 
                 # forward pass
-                pred_tmp = segmentation_module(feed_dict, segSize=segSize)
+                pred_tmp = segmentation_module([feed_dict], segSize=segSize)
                 scores = scores + pred_tmp / len(cfg.DATASET.imgSizes)
 
             _, pred = torch.max(scores, dim=1)

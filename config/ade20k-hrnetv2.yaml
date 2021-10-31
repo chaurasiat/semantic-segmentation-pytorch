@@ -1,10 +1,10 @@
 DATASET:
-  root_dataset: "./data/"
-  list_train: "./data/training.odgt"
-  list_val: "./data/validation.odgt"
-  num_class: 150
-  imgSizes: (300, 375, 450, 525, 600)
-  imgMaxSize: 1000
+  root_dataset: "./"
+  list_train: "./training.odgt"
+  list_val: "./validation.odgt"
+  num_class: 2
+  imgSizes: (1200, 1400, 1600)
+  imgMaxSize: 3000
   padding_constant: 32
   segm_downsampling_rate: 4
   random_flip: True
@@ -15,10 +15,10 @@ MODEL:
   fc_dim: 720
 
 TRAIN:
-  batch_size_per_gpu: 2
+  batch_size_per_gpu: 1
   num_epoch: 30
   start_epoch: 0
-  epoch_iters: 5000
+  epoch_iters: 500
   optim: "SGD"
   lr_encoder: 0.02
   lr_decoder: 0.02
@@ -39,4 +39,4 @@ TEST:
   checkpoint: "epoch_30.pth"
   result: "./"
 
-DIR: "ckpt/ade20k-hrnetv2-c1"
+DIR: "ckpt/model"

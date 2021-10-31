@@ -26,25 +26,65 @@ class SegmentationModule(SegmentationModuleBase):
         self.crit = crit
         self.deep_sup_scale = deep_sup_scale
 
+
+
+
     def forward(self, feed_dict, *, segSize=None):
-        # training
+      # training
+      if type(feed_dict) is list:
+        feed_dict = feed_dict[0]
+               
         if segSize is None:
-            if self.deep_sup_scale is not None: # use deep supervision technique
-                (pred, pred_deepsup) = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True))
-            else:
-                pred = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True))
+          if torch.cuda.is_available():
+              feed_dict['img_data'] = feed_dict['img_data'].cuda()
+              feed_dict['seg_label'] = feed_dict['seg_label'].cuda()
+          else:
+              raise RunTimeError('Cannot convert torch.Floattensor into torch.cuda.FloatTensor')
 
-            loss = self.crit(pred, feed_dict['seg_label'])
-            if self.deep_sup_scale is not None:
-                loss_deepsup = self.crit(pred_deepsup, feed_dict['seg_label'])
-                loss = loss + loss_deepsup * self.deep_sup_scale
+                   
+          if self.deep_sup_scale is not None: # use deep supervision technique
+              (pred, pred_deepsup) = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True))
+          else:
+              pred = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True))
 
-            acc = self.pixel_acc(pred, feed_dict['seg_label'])
-            return loss, acc
+          loss = self.crit(pred, feed_dict['seg_label'])
+          if self.deep_sup_scale is not None:
+              loss_deepsup = self.crit(pred_deepsup, feed_dict['seg_label'])
+              loss = loss + loss_deepsup * self.deep_sup_scale
+
+          acc = self.pixel_acc(pred, feed_dict['seg_label'])
+          return loss, acc
+               
         # inference
         else:
+            print("in prediction")
+            if torch.cuda.is_available():
+                feed_dict['img_data'] = feed_dict['img_data'].cuda()
+            else:
+                raise RunTimeError('Cannot convert torch.Floattensor into torch.cuda.FloatTensor')
             pred = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True), segSize=segSize)
+            print(pred.shape)
             return pred
+
+    # def forward(self, feed_dict, *, segSize=None):
+    #     # training
+    #     if segSize is None:
+    #         if self.deep_sup_scale is not None: # use deep supervision technique
+    #             (pred, pred_deepsup) = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True))
+    #         else:
+    #             pred = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True))
+
+    #         loss = self.crit(pred, feed_dict['seg_label'])
+    #         if self.deep_sup_scale is not None:
+    #             loss_deepsup = self.crit(pred_deepsup, feed_dict['seg_label'])
+    #             loss = loss + loss_deepsup * self.deep_sup_scale
+
+    #         acc = self.pixel_acc(pred, feed_dict['seg_label'])
+    #         return loss, acc
+    #     # inference
+    #     else:
+    #         pred = self.decoder(self.encoder(feed_dict['img_data'], return_feature_maps=True), segSize=segSize)
+    #         return pred
 
 
 class ModelBuilder:
