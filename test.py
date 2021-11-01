@@ -200,13 +200,6 @@ if __name__ == '__main__':
     else:
         imgs = [args.imgs]
 
-    # imgs = ['../testing/images/39.png','../testing/images/8.png','../testing/images/70.png','../testing/images/42.png','../testing/images/43.png',
-    #         '../testing/images/11.png','../testing/images/25.png','../testing/images/97.png','../testing/images/56.png','../testing/images/63.png',
-    #         '../testing/images/90.png']
-
-    imgs = ['../testing/images/39.png']
-          
-    print(imgs)
     assert len(imgs), "imgs should be a path to image (.jpg) or directory."
     cfg.list_test = [{'fpath_img': x} for x in imgs]
 
