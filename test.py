@@ -9,6 +9,7 @@ import torch.nn as nn
 from scipy.io import loadmat
 import csv
 # Our libs
+import cv2
 from mit_semseg.dataset import TestDataset
 from mit_semseg.models import ModelBuilder, SegmentationModule
 from mit_semseg.utils import colorEncode, find_recursive, setup_logger
@@ -47,17 +48,19 @@ def visualize_result(data, pred, cfg):
     # aggregate images and save
     im_vis = np.concatenate((img, pred_color), axis=1)
 
-    img_name = info.split('/')[-1]
+    img_name = "result_" + info.split('/')[-1]
     Image.fromarray(im_vis).save(
         os.path.join(cfg.TEST.result, img_name.replace('.jpg', '.png')))
 
 
 def test(segmentation_module, loader, gpu):
     segmentation_module.eval()
+    
 
     pbar = tqdm(total=len(loader))
     for batch_data in loader:
         # process data
+        
         batch_data = batch_data[0]
         segSize = (batch_data['img_ori'].shape[0],
                    batch_data['img_ori'].shape[1])
@@ -81,12 +84,19 @@ def test(segmentation_module, loader, gpu):
             _, pred = torch.max(scores, dim=1)
             pred = as_numpy(pred.squeeze(0).cpu())
 
+        print(pred)
+        print(pred.shape)
+        img_name = batch_data['info'].split('/')[-1]
+
+        cv2.imwrite( img_name, pred)
         # visualization
         visualize_result(
             (batch_data['img_ori'], batch_data['info']),
             pred,
             cfg
         )
+
+        
 
         pbar.update(1)
 
@@ -189,6 +199,14 @@ if __name__ == '__main__':
         imgs = find_recursive(args.imgs)
     else:
         imgs = [args.imgs]
+
+    # imgs = ['../testing/images/39.png','../testing/images/8.png','../testing/images/70.png','../testing/images/42.png','../testing/images/43.png',
+    #         '../testing/images/11.png','../testing/images/25.png','../testing/images/97.png','../testing/images/56.png','../testing/images/63.png',
+    #         '../testing/images/90.png']
+
+    imgs = ['../testing/images/39.png']
+          
+    print(imgs)
     assert len(imgs), "imgs should be a path to image (.jpg) or directory."
     cfg.list_test = [{'fpath_img': x} for x in imgs]
 
